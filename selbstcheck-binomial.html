@@ -1,0 +1,333 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Selbstcheck Binomialverteilung</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Fraunces:opsz,wght@9..144,600;9..144,700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f7f5f0; --ink:#1a1f33; --blue:#3a5fd9; --purple:#7c5cbf; --green:#0fa86a;
+  --card:#fbfaf7; --tint:#eef0fa; --muted:#5a617a; --line:#d9d6ce;
+  --ok:#0b8a56; --okbg:#e3f5ec; --warn:#8a6100; --warnbg:#fff3cc; --bad:#b3261e; --badbg:#fde7e5;
+  --grad:linear-gradient(135deg,#3a5fd9,#7c5cbf,#0fa86a);
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"DM Sans",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;font-size:17px;line-height:1.5;min-height:100vh;overflow-x:hidden}
+h1,h2,h3,.serif{font-family:Fraunces,Georgia,"Times New Roman",serif;font-weight:700;line-height:1.2;margin:0}
+.topbar{height:8px;background:var(--grad)}
+.wrap{max-width:900px;margin:0 auto;padding:16px}
+.card{border:4px solid transparent;border-radius:22px;background:linear-gradient(var(--card),var(--card)) padding-box,var(--grad) border-box;padding:20px 18px;box-shadow:0 6px 24px rgba(26,31,51,.07)}
+@media(min-width:700px){.card{padding:28px 32px}.wrap{padding:28px 24px}body{font-size:18px}}
+.small{font-size:14px;color:var(--muted)}
+.btn{display:inline-flex;align-items:center;justify-content:center;min-height:48px;padding:10px 24px;border-radius:14px;border:2px solid var(--blue);background:var(--blue);color:#fff;font:inherit;font-weight:700;cursor:pointer;text-align:center}
+.btn.sec{background:#fff;color:var(--blue)}
+.btn[disabled]{opacity:.4;cursor:not-allowed}
+button:focus-visible{outline:4px solid #f5a623;outline-offset:2px}
+.row{display:flex;gap:12px;flex-wrap:wrap;margin-top:22px}
+.row .btn{flex:1 1 140px}
+.start h1{font-size:clamp(28px,7vw,42px);margin:6px 0 14px}
+.start ul{padding-left:1.2em;margin:12px 0 4px}
+.start li{margin:6px 0}
+.progress{margin-bottom:14px}
+.pbar{height:10px;border-radius:6px;background:#e4e1d8;overflow:hidden}
+.pbar>i{display:block;height:100%;background:var(--grad);border-radius:6px;transition:width .25s}
+.ptext{display:flex;justify-content:space-between;align-items:baseline;gap:8px;margin-bottom:6px;flex-wrap:wrap}
+.ptext b{font-weight:700}
+.gap{display:block;height:10px}
+.stem{font-size:1.08em;margin:6px 0 16px}
+.opts{display:grid;grid-template-columns:1fr;gap:10px}
+.opt{display:flex;align-items:center;gap:12px;width:100%;min-height:56px;padding:12px 14px;border-radius:14px;border:2px solid var(--line);background:var(--tint);color:var(--ink);font:inherit;text-align:left;cursor:pointer}
+.opt .dot{flex:none;width:26px;height:26px;border-radius:50%;border:2px solid var(--muted);background:#fff}
+.opt[aria-checked=true]{border-color:var(--blue);background:#e0e6fb;box-shadow:inset 0 0 0 1px var(--blue)}
+.opt[aria-checked=true] .dot{border-color:var(--blue);background:radial-gradient(circle,var(--blue) 0 45%,#fff 50%)}
+.opt .lbl{flex:1;min-width:0;overflow-wrap:anywhere}
+@media(max-width:420px){.opt{font-size:15.5px;padding:12px 10px;gap:8px}.opt .dot{width:22px;height:22px}.tile{gap:10px;padding:12px 10px}.tile .letter{min-width:52px}}
+.opts.hist{grid-template-columns:1fr}
+.opts.hist .opt{flex-direction:column;align-items:stretch;padding:10px 12px;gap:6px}
+.opts.hist .head{display:flex;align-items:center;gap:10px;font-weight:700}
+@media(min-width:700px){.opts.hist{grid-template-columns:1fr 1fr}}
+svg.tree{display:block;width:100%;max-width:460px;height:auto;margin:0 auto}
+.treefig{background:#fff;margin-bottom:16px}.treefig .cap{font-size:14px;text-align:center;margin-top:4px}
+svg.hist{display:block;width:100%;height:auto;background:#fff;border-radius:10px;border:1px solid var(--line)}
+.figs{display:grid;grid-template-columns:1fr;gap:12px;margin:0 0 16px}
+@media(min-width:700px){.figs{grid-template-columns:1fr 1fr}}
+.fig{border:1px solid var(--line);border-radius:12px;padding:8px;background:var(--tint)}
+.fig b{display:block;margin:0 0 4px 4px}
+sub,sup{line-height:0;font-size:.72em}
+.sqrt{white-space:nowrap}
+.rad{border-top:1.5px solid currentColor;padding:0 2px;margin-left:1px}
+.tiles{display:grid;grid-template-columns:1fr;gap:12px;margin:18px 0}
+@media(min-width:700px){.tiles{grid-template-columns:1fr 1fr}}
+.tile{border-radius:16px;padding:12px 14px;border:2px solid;display:flex;gap:12px;align-items:flex-start}
+.tile .letter{flex:none;min-width:56px;height:44px;padding:0 10px;border-radius:22px;display:flex;align-items:center;justify-content:center;font-family:Fraunces,Georgia,serif;font-weight:700;font-size:20px;color:#fff;white-space:nowrap}
+.tile .nm{font-weight:700}
+.tile .msg{margin-top:2px}
+.tile .sc{font-size:14px;opacity:.85}
+.g{background:var(--okbg);border-color:var(--ok);color:#06402a}.g .letter{background:var(--ok)}
+.y{background:var(--warnbg);border-color:#d99a00;color:#4d3600}.y .letter{background:#c28a00}
+.r{background:var(--badbg);border-color:var(--bad);color:#5c120d}.r .letter{background:var(--bad)}
+.note{background:var(--tint);border-radius:12px;padding:12px 14px;border-left:6px solid var(--purple)}
+.rev{border:2px solid var(--line);border-radius:16px;padding:14px;margin:14px 0;background:#fff}
+.rev .hd{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:6px}
+.pill{display:inline-block;padding:2px 10px;border-radius:99px;font-size:14px;font-weight:700}
+.pill.g{background:var(--okbg);color:var(--ok)}.pill.r{background:var(--badbg);color:var(--bad)}
+.ans{margin:6px 0;padding:8px 10px;border-radius:10px;overflow-wrap:anywhere}
+.ans.g{background:var(--okbg)}.ans.r{background:var(--badbg)}
+.ans .who{font-size:13px;font-weight:700;display:block}
+.expl{margin-top:8px;padding:10px 12px;background:var(--tint);border-radius:10px}
+.revh{display:grid;grid-template-columns:1fr;gap:8px;margin-top:6px}
+@media(min-width:700px){.revh{grid-template-columns:1fr 1fr}}
+.cap{font-size:13px;color:var(--muted);margin-top:2px}
+</style>
+</head>
+<body>
+<div class="topbar"></div>
+<div class="wrap"><main id="app" class="card" aria-live="polite"></main></div>
+<script>
+const DATA = {"areas": {"L1": {"name": "Lernschritt 1 · Pfadregeln", "ws": "Wissensspeicher Lernschritt 1", "badge": "1"}, "L23": {"name": "Lernschritt 2 & 3 · Bedingte Wahrscheinlichkeit & Unabhängigkeit", "ws": "Wissensspeicher Lernschritt 2 & 3", "badge": "2&3"}, "L4": {"name": "Lernschritt 4 · Erwartungswert & Standardabweichung", "ws": "Wissensspeicher Lernschritt 4", "badge": "4"}, "L5": {"name": "Lernschritt 5 · Bernoulli-Formel", "ws": "Wissensspeicher Lernschritt 5", "badge": "5"}, "L67a": {"name": "Lernschritt 6 & 7 · μ und σ der Binomialverteilung", "ws": "Wissensspeicher Lernschritt 6 & 7 (μ und σ)", "badge": "6&7"}, "L67b": {"name": "Lernschritt 6 & 7 · Histogramme", "ws": "Wissensspeicher Lernschritt 6 & 7 (Histogramme)", "badge": "6&7"}, "L7a": {"name": "Lernschritt 7 · Vom Text zum P-Term", "ws": "Wissensspeicher Lernschritt 7 (Text zum P-Term)", "badge": "7"}, "L7b": {"name": "Lernschritt 7 · WSK-Rechner", "ws": "Wissensspeicher Lernschritt 7 (WSK-Rechner)", "badge": "7"}}, "items": [{"id": "L1-1", "area": "L1", "stem": "Ein Basketballspieler trifft beim Freiwurf mit der Wahrscheinlichkeit 0,7. Er wirft dreimal. Wie groß ist die Wahrscheinlichkeit für die Folge Treffer – Treffer – Fehlwurf (genau in dieser Reihenfolge)?", "figure": null, "options": [{"text": "0,7·0,7·0,3 = 0,147", "correct": true}, {"text": "3·0,7·0,7·0,3 = 0,441", "correct": false}, {"text": "0,7·0,3·0,3 = 0,063", "correct": false}, {"text": "0,7·0,7·0,7 = 0,343", "correct": false}], "explanation": "Entlang eines Pfades werden die Wahrscheinlichkeiten multipliziert: 0,7·0,7·0,3 = 0,147. Die Reihenfolge ist hier festgelegt, es gibt also nur diesen einen Pfad."}, {"id": "L1-2", "area": "L1", "stem": "In einer Lostrommel beim Schulfest liegen 5 Lose: 2 Gewinne und 3 Nieten. Du ziehst zwei Lose nacheinander ohne Zurücklegen. Wie berechnest du die Wahrscheinlichkeit für genau einen Gewinn?", "figure": null, "options": [{"text": "2/5·3/5 + 3/5·2/5 = 0,48", "correct": false}, {"text": "2/5·3/4 = 0,3", "correct": false}, {"text": "2/5·3/4 + 3/5·2/4 = 0,6", "correct": true}, {"text": "2/5·3/4 · 3/5·2/4 = 0,09", "correct": false}], "explanation": "Zwei Pfade führen zu genau einem Gewinn (Gewinn–Niete und Niete–Gewinn). Pfadregel: entlang jedes Pfades multiplizieren, die Pfade addieren: 0,3 + 0,3 = 0,6. Ohne Zurücklegen ändern sich die Wahrscheinlichkeiten im zweiten Zug (Nenner 4)."}, {"id": "L23-1", "area": "L23", "stem": "(1) Die Person trägt eine Brille. Mit welcher Wahrscheinlichkeit singt sie im Chor?\n(2) Die Person singt im Chor. Mit welcher Wahrscheinlichkeit trägt sie eine Brille?", "figure": {"type": "tree", "pB": 0.4, "pCgB": 0.25, "pCgnB": 0.3, "legend": "B: trägt Brille, C: singt im Chor (Querstrich = nicht)"}, "options": [{"text": "(1) 0,25\n(2) 0,1 : 0,28 ≈ 0,36", "correct": true}, {"text": "(1) 0,25\n(2) 0,1", "correct": false}, {"text": "(1) 0,25\n(2) 0,4", "correct": false}, {"text": "(1) 0,1\n(2) 0,1 : 0,28 ≈ 0,36", "correct": false}], "explanation": "(1) Die Bedingung Brille steht im Baum vorne – du liest am Ast nach B ab: 0,25 (= 0,1 : 0,4). (2) Jetzt ist Chor die Bedingung. Die steht im Baum hinten und lässt sich nicht ablesen: P(C) = 0,1 + 0,18 = 0,28 (beide Pfade zu C), dann P_{C}(B) = 0,1 : 0,28 ≈ 0,36. Die 0,1 allein wäre nur der Pfad (nicht geteilt), 0,4 ist P(B)."}, {"id": "L23-2", "area": "L23", "stem": "Es gilt P(A) = 0,5, P(B) = 0,4 und P(A∩B) = 0,2. Welche Aussage stimmt?", "figure": null, "options": [{"text": "abhängig, weil 0,2 ≠ 0,5 + 0,4", "correct": false}, {"text": "abhängig, weil P(A) ≠ P(B)", "correct": false}, {"text": "unabhängig, weil 0,5 · 0,4 = 0,2 = P(A∩B)", "correct": true}, {"text": "unabhängig, weil P(A) größer ist als P(B)", "correct": false}], "explanation": "Unabhängig heißt P(A∩B) = P(A)·P(B). Hier ist 0,5 · 0,4 = 0,2, und das ist genau P(A∩B) = 0,2. Also sind A und B unabhängig. Ob P(A) größer oder kleiner als P(B) ist, sagt nichts zur Unabhängigkeit, und die Summe 0,5 + 0,4 spielt keine Rolle."}, {"id": "L4-1", "area": "L4", "stem": "Ein Glücksrad zahlt X Euro aus: 0 € mit Wahrscheinlichkeit 0,5, 2 € mit 0,3 und 10 € mit 0,2. Welchen Wert hat der Erwartungswert E(X)?", "figure": null, "options": [{"text": "E(X) = 12", "correct": false}, {"text": "E(X) = 4", "correct": false}, {"text": "E(X) = 1", "correct": false}, {"text": "E(X) = 2,6", "correct": true}], "explanation": "E(X) = 0·0,5 + 2·0,3 + 10·0,2 = 0,6 + 2 = 2,6. Jeder Wert wird mit seiner Wahrscheinlichkeit multipliziert und dann addiert; (0+2+10)/3 = 4 wäre der Mittelwert ohne Gewichtung. Auf lange Sicht zahlt das Rad im Schnitt 2,60 € pro Drehung aus."}, {"id": "L4-2", "area": "L4", "stem": "Eine Zufallsgröße X nimmt den Wert 0 mit Wahrscheinlichkeit 0,8 und den Wert 10 mit Wahrscheinlichkeit 0,2 an. Es gilt μ = 2. Welche Rechnung für die Standardabweichung σ ist richtig eingesetzt?", "figure": null, "options": [{"text": "σ = √((0 − 2)²·0,8 + (10 − 2)²·0,2)", "correct": true}, {"text": "σ = (0 − 2)²·0,8 + (10 − 2)²·0,2", "correct": false}, {"text": "σ = √((0 − 2)·0,8 + (10 − 2)·0,2)", "correct": false}, {"text": "σ = √(0²·0,8 + 10²·0,2)", "correct": false}], "explanation": "Für jeden Wert rechnest du (Wert − μ)² mal seine Wahrscheinlichkeit, addierst alles und ziehst die Wurzel. Hier: σ = √((0 − 2)²·0,8 + (10 − 2)²·0,2) = √(3,2 + 12,8) = √16 = 4. Bei den anderen fehlt die Wurzel, das Quadrat oder das Abziehen von μ."}, {"id": "L5-1", "area": "L5", "stem": "Du würfelst 7-mal und achtest auf Sechsen. Wie viele Pfade im Baumdiagramm haben genau eine Sechs?", "figure": null, "options": [{"text": "1 Pfad", "correct": false}, {"text": "6 Pfade", "correct": false}, {"text": "7 Pfade", "correct": true}, {"text": "49 Pfade", "correct": false}], "explanation": "Die eine Sechs kann im 1., 2., … oder 7. Wurf fallen (SNNNNNN, NSNNNNN, …). Das sind 7 Pfade. Merke: Bei k = 1 gibt es n Pfade."}, {"id": "L5-2", "area": "L5", "stem": "Ein Tischtennisspieler schlägt 10-mal auf; jeder Aufschlag gelingt mit 0,8. Für genau 7 gelungene Aufschläge gilt P_{10;0,8}(X = 7) = 120·0,8^{7}·0,2^{3}. Was beschreibt der Faktor 0,2^{3}?", "figure": null, "options": [{"text": "Die Wahrscheinlichkeit, dass 3 bestimmte Aufschläge alle misslingen", "correct": true}, {"text": "Die Wahrscheinlichkeit für genau 3 gelungene Aufschläge", "correct": false}, {"text": "Die Anzahl der Pfade mit 3 Fehlern", "correct": false}, {"text": "Die Wahrscheinlichkeit, dass mindestens einer von 3 Aufschlägen misslingt", "correct": false}], "explanation": "Auf einem Pfad mit 7 Treffern gibt es 10 − 7 = 3 Fehler, jeder mit Wahrscheinlichkeit 0,2. Entlang des Pfades wird multipliziert: 0,2·0,2·0,2 = 0,2^{3}. Die 120 ist die Pfadanzahl (so viele Möglichkeiten gibt es, die 3 Fehler auf die 10 Aufschläge zu verteilen) und steht als eigener Faktor davor."}, {"id": "L67a-1", "area": "L67a", "stem": "X ist binomialverteilt mit n = 50 und p = 0,25. Welche Angabe stimmt?", "figure": null, "options": [{"text": "μ = 12,5 und σ = 50·0,25·0,75", "correct": false}, {"text": "μ = 12,5 und σ = √(50·0,25·0,75)", "correct": true}, {"text": "μ = 12,5 und σ = √(50·0,25)", "correct": false}, {"text": "μ = 37,5 und σ = √(50·0,25·0,75)", "correct": false}], "explanation": "μ = n·p = 50·0,25 = 12,5 und σ = √(n·p·(1−p)) = √(50·0,25·0,75) ≈ 3,06. Bei „σ = 50·0,25·0,75“ fehlt die Wurzel, bei „√(50·0,25)“ der Faktor (1−p) = 0,75, und μ = 37,5 ist n·(1−p), also mit der Nieten-Wahrscheinlichkeit gerechnet."}, {"id": "L67a-2", "area": "L67a", "stem": "Eine Torschützin trifft beim Elfmeter mit der Wahrscheinlichkeit 0,75 und schießt 100-mal. Für die Trefferzahl gilt μ = 75 und σ = √(100·0,75·0,25) ≈ 4,3. Welche Aussage passt dazu?", "figure": null, "options": [{"text": "Die Trefferzahl weicht typischerweise um etwa 18,75 von 75 ab.", "correct": false}, {"text": "Die Trefferzahl liegt immer zwischen 75 − 4,3 und 75 + 4,3.", "correct": false}, {"text": "Sie trifft in jeder 100er-Serie genau 75-mal.", "correct": false}, {"text": "Meist liegt die Trefferzahl in der Nähe von 75; typisch weicht sie um etwa 4 davon ab.", "correct": true}], "explanation": "μ = 75 ist der Wert, um den die Trefferzahlen schwanken; σ ≈ 4,3 gibt die typische Abweichung davon an. Einzelne Serien können auch weiter entfernt liegen. 18,75 ist die Varianz, nicht σ."}, {"id": "L67b-1", "area": "L67b", "stem": "Eine Schützin trifft mit der Wahrscheinlichkeit 0,7 und schießt 20-mal. X zählt die Treffer. Alle Diagramme haben dieselbe Skala. Welches Histogramm gehört zu X?", "figure": null, "options": [{"text": "Diagramm 1", "correct": false, "histogram": {"n": 20, "p": 0.5, "xmax": 20, "ymax": 0.3}}, {"text": "Diagramm 2", "correct": false, "histogram": {"n": 20, "p": 0.9, "xmax": 20, "ymax": 0.3}}, {"text": "Diagramm 3", "correct": false, "histogram": {"n": 20, "p": 0.2, "xmax": 20, "ymax": 0.3}}, {"text": "Diagramm 4", "correct": true, "histogram": {"n": 20, "p": 0.7, "xmax": 20, "ymax": 0.3}}], "explanation": "μ = n·p = 20·0,7 = 14. Das Maximum des Histogramms liegt in der Nähe von μ, hier bei 14. Die anderen Diagramme haben ihr Maximum bei 10 (p = 0,5), 18 (p = 0,9) und 4 (p = 0,2)."}, {"id": "L67b-2", "area": "L67b", "stem": "Die beiden Histogramme gehören zu Binomialverteilungen mit demselben μ = 8. Eine hat σ ≈ 1,26, die andere σ ≈ 2,45. Beide haben dieselbe Skala. Welche Aussage stimmt?", "figure": {"type": "histograms", "items": [{"label": "I", "n": 32, "p": 0.25}, {"label": "II", "n": 10, "p": 0.8}], "xmax": 20, "ymax": 0.35}, "options": [{"text": "σ ≈ 1,26 gehört zu I, σ ≈ 2,45 gehört zu II.", "correct": false}, {"text": "Beide haben dasselbe σ, weil sie dasselbe μ haben.", "correct": false}, {"text": "σ ≈ 1,26 gehört zu II, σ ≈ 2,45 gehört zu I.", "correct": true}, {"text": "Das σ lässt sich aus dem Histogramm nicht erkennen.", "correct": false}], "explanation": "Größeres σ bedeutet: breiter und flacher. Histogramm I ist breiter, also gehört σ ≈ 2,45 (n = 32, p = 0,25) dazu. Histogramm II ist schmaler und höher: σ ≈ 1,26 (n = 10, p = 0,8)."}, {"id": "L67b-3", "area": "L67b", "stem": "Alle vier Histogramme haben dieselbe Skala. Welches gehört zu der Verteilung mit dem größten σ?", "figure": null, "options": [{"text": "Diagramm 1", "correct": false, "histogram": {"n": 60, "p": 0.95, "xmax": 60, "ymax": 0.3}}, {"text": "Diagramm 2", "correct": false, "histogram": {"n": 10, "p": 0.5, "xmax": 60, "ymax": 0.3}}, {"text": "Diagramm 3", "correct": false, "histogram": {"n": 30, "p": 0.5, "xmax": 60, "ymax": 0.3}}, {"text": "Diagramm 4", "correct": true, "histogram": {"n": 60, "p": 0.5, "xmax": 60, "ymax": 0.3}}], "explanation": "σ misst die Breite: Je größer σ, desto breiter und flacher das Histogramm. Das breiteste und flachste ist n = 60, p = 0,5 mit σ ≈ 3,87. Die anderen haben σ ≈ 1,69 (p = 0,95), 1,58 (n = 10) und 2,74 (n = 30)."}, {"id": "L7a-1", "area": "L7a", "stem": "Bei einer Umfrage nutzen 30 % der Schüler:innen das Fahrrad. Du befragst 25 zufällig ausgewählte. X zählt die Radfahrer. Gesucht: Wahrscheinlichkeit, dass weniger als 7 Radfahrer dabei sind.", "figure": null, "options": [{"text": "P_{25;0,3}(X ≤ 7)", "correct": false}, {"text": "1 − P_{25;0,3}(X ≤ 7)", "correct": false}, {"text": "P_{25;0,3}(X ≥ 7)", "correct": false}, {"text": "P_{25;0,3}(X ≤ 6)", "correct": true}], "explanation": "„Weniger als 7“ heißt 0 bis 6 Radfahrer, also X ≤ 6. X ≤ 7 würde die 7 mitzählen; 1 − P_{25;0,3}(X ≤ 7) entspricht „mehr als 7“."}, {"id": "L7a-2", "area": "L7a", "stem": "In einer Fertigung sind 4 % der Teile defekt. Du prüfst 40 Teile. X zählt die defekten Teile. Gesucht: Wahrscheinlichkeit für mindestens 3 defekte Teile.", "figure": null, "options": [{"text": "P_{40;0,04}(X ≥ 4)", "correct": false}, {"text": "P_{40;0,96}(X ≥ 3)", "correct": false}, {"text": "P_{40;0,04}(X ≥ 3)", "correct": true}, {"text": "P_{40;0,04}(X ≤ 3)", "correct": false}], "explanation": "„Mindestens 3“ heißt 3 oder mehr: X ≥ 3. X ≥ 4 wäre „mehr als 3“. Da X die defekten Teile zählt, ist p = 0,04; mit p = 0,96 würdest du die einwandfreien zählen."}, {"id": "L7b-1", "area": "L7b", "stem": "Ein Glücksrad hat ein Gewinnfeld mit 20 %. Du drehst 30-mal; X zählt die Gewinne. Du willst P_{30;0,2}(X < 8) im Wahrscheinlichkeitsrechner bestimmen; Binomial, n und p sind schon eingestellt. Was wählst du unter „Intervall“?", "figure": null, "options": [{"text": "Button ] (links) wählen und P(X ≤ 7) einstellen", "correct": true}, {"text": "Button ] (links) wählen und P(X ≤ 8) einstellen", "correct": false}, {"text": "Button [ (rechts) wählen und P(X ≥ 8) einstellen", "correct": false}, {"text": "Button [ (rechts) wählen und P(X ≥ 7) einstellen", "correct": false}], "explanation": "Der Rechner kennt nur ≤ und ≥. Wandle „<“ vorher um: X < 8 ist dasselbe wie X ≤ 7. Das ist linksseitig, also der Button ] (links), und in der Ergebniszeile stellst du P(X ≤ 7) ein. Der Button [ (rechts) liefert „X ≥ …“ und damit den falschen Bereich."}, {"id": "L7b-2", "area": "L7b", "stem": "Von 12 Samen keimen erfahrungsgemäß 85 %. X zählt die Samen, die nicht keimen. Was trägst du im Wahrscheinlichkeitsrechner bei n und p ein?", "figure": null, "options": [{"text": "n = 12, p = 0,85", "correct": false}, {"text": "n = 12, p = 15", "correct": false}, {"text": "n = 12, p = 0,015", "correct": false}, {"text": "n = 12, p = 0,15", "correct": true}], "explanation": "p ist immer die Wahrscheinlichkeit dessen, was X zählt. X zählt die nicht keimenden Samen: 100 % − 85 % = 15 %, also p = 0,15. Prozentangaben trägst du als Dezimalzahl ein. Im Rechner tippst du dafür einen Punkt statt eines Kommas: 0.15."}]};
+(function(){
+"use strict";
+var areas = DATA.areas, items = DATA.items;
+var app = document.getElementById("app");
+var state = {screen:"start", idx:0, answers:[], orders:[]};
+
+/* ---------- Markup ---------- */
+function esc(s){return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");}
+function matchClose(s,i,open,close){ // s[i] is the char after the opening one; returns index of matching close
+  var d=1;
+  for(var j=i;j<s.length;j++){
+    if(s[j]===open)d++;
+    else if(s[j]===close){d--; if(d===0)return j;}
+  }
+  return -1;
+}
+function fmt(s){
+  var out="",buf="",i=0;
+  function flush(){out+=esc(buf).replace(/\n/g,"<br>").replace(/ %/g,"&nbsp;%").replace(/ €/g,"&nbsp;€");buf="";}
+  while(i<s.length){
+    var c=s[i],n=s[i+1];
+    if((c==="_"||c==="^")&&n==="{"){
+      var e=matchClose(s,i+2,"{","}");
+      if(e>0){flush();var t=c==="_"?"sub":"sup";out+="<"+t+">"+fmt(s.slice(i+2,e))+"</"+t+">";i=e+1;continue;}
+    }
+    if(c==="√"){
+      if(n==="("){
+        var e2=matchClose(s,i+2,"(",")");
+        if(e2>0){flush();out+='<span class="sqrt">√<span class="rad">'+fmt(s.slice(i+2,e2))+'</span></span>';i=e2+1;continue;}
+      } else {
+        var m=/^[0-9][0-9,.]*[0-9]|^[0-9]/.exec(s.slice(i+1));
+        if(m){flush();out+='<span class="sqrt">√<span class="rad">'+esc(m[0])+'</span></span>';i+=1+m[0].length;continue;}
+      }
+    }
+    buf+=c;i++;
+  }
+  flush();return out;
+}
+
+/* ---------- Binomial ---------- */
+var LF=[0];for(var q=1;q<=400;q++)LF[q]=LF[q-1]+Math.log(q);
+function pmf(n,p,k){
+  if(k<0||k>n)return 0;
+  if(p<=0)return k===0?1:0;
+  if(p>=1)return k===n?1:0;
+  return Math.exp(LF[n]-LF[k]-LF[n-k]+k*Math.log(p)+(n-k)*Math.log(1-p));
+}
+function dec(x,d){return x.toFixed(d).replace(".",",");}
+function niceStep(max,maxTicks){
+  var steps=[1,2,5,10,20,25,50,100];
+  for(var i=0;i<steps.length;i++)if(max/steps[i]<=maxTicks)return steps[i];
+  return 100;
+}
+function histSVG(h,label){
+  var W=320,H=200,L=40,R=10,T=10,B=34,pw=W-L-R,ph=H-T-B;
+  var xmax=h.xmax,ymax=h.ymax,bw=pw/(xmax+1);
+  var s='<svg class="hist" viewBox="0 0 '+W+' '+H+'" role="img" aria-label="'+esc(label)+'" focusable="false">';
+  var ystep=ymax<=0.2?0.05:0.1;
+  for(var y=0;y<=ymax+1e-9;y+=ystep){
+    var yy=T+ph-y/ymax*ph;
+    s+='<line x1="'+L+'" x2="'+(W-R)+'" y1="'+yy.toFixed(1)+'" y2="'+yy.toFixed(1)+'" stroke="#e1ded6" stroke-width="1"/>';
+    s+='<text x="'+(L-5)+'" y="'+(yy+4).toFixed(1)+'" text-anchor="end" font-size="11" fill="#5a617a">'+dec(y,y<0.001?0:(ystep<0.1?2:1))+'</text>';
+  }
+  for(var k=0;k<=xmax;k++){
+    var v=Math.min(pmf(h.n,h.p,k),ymax);
+    var bh=v/ymax*ph; if(bh<0.3)continue;
+    s+='<rect x="'+(L+k*bw+bw*0.08).toFixed(2)+'" y="'+(T+ph-bh).toFixed(2)+'" width="'+(bw*0.84).toFixed(2)+'" height="'+bh.toFixed(2)+'" fill="#3a5fd9" rx="'+Math.min(1.5,bw*0.2).toFixed(1)+'"/>';
+  }
+  s+='<line x1="'+L+'" x2="'+(W-R)+'" y1="'+(T+ph)+'" y2="'+(T+ph)+'" stroke="#1a1f33" stroke-width="1.4"/>';
+  s+='<line x1="'+L+'" x2="'+L+'" y1="'+T+'" y2="'+(T+ph)+'" stroke="#1a1f33" stroke-width="1.4"/>';
+  var xs=niceStep(xmax,10);
+  for(var t=0;t<=xmax;t+=xs){
+    var cx=L+t*bw+bw/2;
+    s+='<line x1="'+cx.toFixed(1)+'" x2="'+cx.toFixed(1)+'" y1="'+(T+ph)+'" y2="'+(T+ph+4)+'" stroke="#1a1f33"/>';
+    s+='<text x="'+cx.toFixed(1)+'" y="'+(T+ph+16)+'" text-anchor="middle" font-size="11" fill="#1a1f33">'+t+'</text>';
+  }
+  s+='<text x="'+(L+pw/2)+'" y="'+(H-3)+'" text-anchor="middle" font-size="11" fill="#5a617a" font-style="italic">k</text>';
+  s+='</svg>';
+  return s;
+}
+
+
+function nm(x){return String(Math.round(x*1000)/1000).replace(".",",");}
+function lab(s,neg){ // Buchstabe, ggf. mit Querstrich (Overline)
+  return neg?'<tspan text-decoration="overline">'+s+'</tspan>':s;
+}
+function treeSVG(f){
+  var pB=f.pB,pCB=f.pCgB,pCn=f.pCgnB;
+  var W=312,H=250,s='<svg class="tree" viewBox="0 0 '+W+' '+H+'" role="img" aria-label="Baumdiagramm mit Brille und Chor" focusable="false" font-size="15.5">';
+  var rx=14,ry=125,x1=88,x2=196,ys=[65,185],y2=[35,95,155,215];
+  function edge(xa,ya,xb,yb,p,dy){
+    s+='<line x1="'+xa+'" y1="'+ya+'" x2="'+xb+'" y2="'+yb+'" stroke="#5a617a" stroke-width="1.6"/>';
+    var mx=(xa+xb)/2,my=(ya+yb)/2;
+    s+='<text x="'+(mx-(dy<0?4:3)).toFixed(1)+'" y="'+(my+(dy<0?dy:15)).toFixed(1)+'" text-anchor="end" fill="#1a1f33" stroke="#fff" stroke-width="3.5" paint-order="stroke" stroke-linejoin="round">'+nm(p)+'</text>';
+  }
+  edge(rx,ry,x1-14,ys[0],pB,-4);edge(rx,ry,x1-14,ys[1],1-pB,12);
+  edge(x1+14,ys[0],x2-14,y2[0],pCB,-4);edge(x1+14,ys[0],x2-14,y2[1],1-pCB,13);
+  edge(x1+14,ys[1],x2-14,y2[2],pCn,-4);edge(x1+14,ys[1],x2-14,y2[3],1-pCn,13);
+  function node(x,y,l,neg){
+    s+='<circle cx="'+x+'" cy="'+y+'" r="14" fill="#eef0fa" stroke="#3a5fd9" stroke-width="2"/>';
+    s+='<text x="'+x+'" y="'+(y+5)+'" text-anchor="middle" font-weight="700" fill="#1a1f33">'+lab(l,neg)+'</text>';
+  }
+  s+='<circle cx="'+rx+'" cy="'+ry+'" r="4" fill="#5a617a"/>';
+  node(x1,ys[0],"B",0);node(x1,ys[1],"B",1);
+  var ends=[[0,0,pB*pCB],[0,1,pB*(1-pCB)],[1,0,(1-pB)*pCn],[1,1,(1-pB)*(1-pCn)]];
+  ends.forEach(function(e,i){
+    node(x2,y2[i],"C",e[1]);
+    var parent=e[0]?'<tspan text-decoration="overline">B</tspan>':'B';
+    var child=e[1]?'<tspan text-decoration="overline">C</tspan>':'C';
+    s+='<text x="'+(x2+20)+'" y="'+(y2[i]+5)+'" fill="#1a1f33">'+parent+'∩'+child+' = <tspan font-weight="700">'+nm(e[2])+'</tspan></text>';
+  });
+  return s+'</svg>';
+}
+function figHTML(it){
+  var f=it.figure;if(!f)return "";
+  if(f.type==="histograms")return '<div class="figs">'+f.items.map(function(g){
+    return '<div class="fig"><b>Histogramm '+esc(g.label)+'</b>'+histSVG({n:g.n,p:g.p,xmax:f.xmax,ymax:f.ymax},"Histogramm "+g.label)+'</div>';}).join("")+'</div>';
+  if(f.type==="tree")return '<div class="fig treefig">'+treeSVG(f)+'<div class="cap">'+esc(f.legend)+'</div></div>';
+  return "";
+}
+
+/* ---------- Helpers ---------- */
+function shuffle(a){a=a.slice();for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=a[i];a[i]=a[j];a[j]=t;}return a;}
+function isHist(it){return it.options.some(function(o){return !!o.histogram;});}
+function optLabel(it,pos){return isHist(it)?"Diagramm "+(pos+1):null;}
+function optHTML(it,oi,pos){ // option content (no checkmarks)
+  var o=it.options[oi];
+  return o.histogram ? "Diagramm "+(pos+1) : fmt(o.text);
+}
+function reset(){
+  state.idx=0;state.answers=items.map(function(){return null;});
+  state.orders=items.map(function(it){return shuffle(it.options.map(function(_,i){return i;}));});
+}
+function setScreen(s){state.screen=s;render();window.scrollTo(0,0);var h=app.querySelector("[data-focus]");if(h){h.setAttribute("tabindex","-1");try{h.focus({preventScroll:true});}catch(e){}}}
+function isCorrect(i){var a=state.answers[i];return a!==null&&items[i].options[a].correct;}
+function areaStats(){
+  var res={};
+  items.forEach(function(it,i){var r=res[it.area]||(res[it.area]={n:0,c:0});r.n++;if(isCorrect(i))r.c++;});
+  return res;
+}
+function light(c,n){return c===n?"g":(c*2>=n?"y":"r");}
+
+/* ---------- Screens ---------- */
+function viewStart(){
+  return '<section class="start"><div class="small">Mathe Q2 · Grundkurs</div>'+
+  '<h1 data-focus>Selbstcheck Binomialverteilung</h1>'+
+  '<p>Finde heraus, wo du schon sicher bist und was du dir noch einmal anschauen solltest.</p>'+
+  '<ul><li><b>'+items.length+' Fragen</b>, ca. 15 Minuten</li><li>Am besten am Handy machen. Dein iPad mit dem Skript und dem WSK-Rechner darfst du nebenbei offen haben – zum Nachschauen und Nachrechnen.</li><li>Pro Frage ist genau eine Antwort richtig.</li><li>Am Ende bekommst du eine Ampel pro Lernschritt.</li></ul>'+
+  '<div class="row"><button class="btn" id="go">Los geht\'s</button></div></section>';
+}
+function viewQ(){
+  var i=state.idx,it=items[i],ord=state.orders[i],hist=isHist(it);
+  var pct=Math.round(i/items.length*100);
+  var h='<section><div class="progress"><div class="ptext"><b data-focus>Frage '+(i+1)+' von '+items.length+'</b><span class="small">'+esc(areas[it.area].name)+'</span></div>'+
+   '<div class="pbar" role="progressbar" aria-valuemin="0" aria-valuemax="'+items.length+'" aria-valuenow="'+(i+1)+'"><i style="width:'+((i+1)/items.length*100)+'%"></i></div></div>';
+  h+='<p class="stem">'+fmt(it.stem).replace(/<br>/g,'<span class="gap"></span>')+'</p>';
+  h+=figHTML(it);
+  h+='<div class="opts'+(hist?' hist':'')+'" role="radiogroup" aria-label="Antwortmöglichkeiten">';
+  ord.forEach(function(oi,pos){
+    var o=it.options[oi],sel=state.answers[i]===oi;
+    if(o.histogram){
+      h+='<button type="button" class="opt" role="radio" aria-checked="'+sel+'" aria-label="Diagramm '+(pos+1)+'" data-oi="'+oi+'"><span class="head"><span class="dot"></span>Diagramm '+(pos+1)+'</span>'+histSVG(o.histogram,"Diagramm "+(pos+1))+'</button>';
+    } else {
+      h+='<button type="button" class="opt" role="radio" aria-checked="'+sel+'" data-oi="'+oi+'"><span class="dot"></span><span class="lbl">'+fmt(o.text)+'</span></button>';
+    }
+  });
+  h+='</div><div class="row">'+
+   '<button class="btn sec" id="back"'+(i===0?' disabled':'')+'>Zurück</button>'+
+   '<button class="btn" id="next"'+(state.answers[i]===null?' disabled':'')+'>'+(i===items.length-1?'Auswerten':'Weiter')+'</button></div></section>';
+  return h;
+}
+function viewResult(){
+  var st=areaStats(),total=0,all=items.length;
+  items.forEach(function(_,i){if(isCorrect(i))total++;});
+  var h='<section><h2 data-focus style="font-size:clamp(24px,6vw,34px)">Deine Auswertung</h2><p class="small" style="margin:6px 0 0">Gesamt: '+total+' von '+all+' richtig</p><div class="tiles">';
+  Object.keys(areas).forEach(function(k){
+    var r=st[k]||{n:0,c:0};if(!r.n)return;
+    var l=light(r.c,r.n),ws=areas[k].ws;
+    var msg=l==="g"?"Alles richtig 👍":l==="y"?"Noch mal anschauen – "+ws:"In diesem Lernschritt noch üben – "+ws;
+    var ic=l==="g"?"🟢":l==="y"?"🟡":"🔴";
+    h+='<div class="tile '+l+'" data-area="'+k+'" data-light="'+l+'"><span class="letter" aria-hidden="true">'+esc(areas[k].badge)+'</span><div><div class="nm">'+esc(areas[k].name)+'</div>'+
+      '<div class="msg"><span aria-hidden="true">'+ic+'</span> '+esc(msg)+'</div><div class="sc">'+r.c+' von '+r.n+' richtig</div></div></div>';
+  });
+  h+='</div><p class="note"><b>Notiere dir deine gelben und roten Lernschritte.</b></p>'+
+   '<div class="row"><button class="btn" id="review">Antworten ansehen</button><button class="btn sec" id="restart">Neu starten</button></div></section>';
+  return h;
+}
+function ansBlock(it,oi,pos,cls,who,showParams){
+  var o=it.options[oi],body;
+  if(o.histogram){
+    body='<b>Diagramm '+(pos+1)+'</b>'+histSVG(o.histogram,"Diagramm "+(pos+1))+
+      (showParams?'<div class="cap">n = '+o.histogram.n+', p = '+dec(o.histogram.p,2)+'</div>':'');
+  } else body=fmt(o.text);
+  return '<div class="ans '+cls+'"><span class="who">'+who+'</span>'+body+'</div>';
+}
+function viewReview(){
+  var h='<section><h2 data-focus style="font-size:clamp(24px,6vw,34px)">Deine Antworten</h2>';
+  items.forEach(function(it,i){
+    var ok=isCorrect(i),a=state.answers[i],ord=state.orders[i];
+    var posOf=function(oi){return ord.indexOf(oi);};
+    var ci=it.options.findIndex(function(o){return o.correct;});
+    h+='<article class="rev"><div class="hd"><b>Frage '+(i+1)+'</b><span class="small">'+esc(areas[it.area].name)+'</span><span class="pill '+(ok?'g':'r')+'">'+(ok?'✓ richtig':'✗ falsch')+'</span></div>';
+    h+='<p style="margin:4px 0 8px">'+fmt(it.stem).replace(/<br>/g,'<span class="gap"></span>')+'</p>';
+    h+=figHTML(it);
+    var hist=isHist(it);
+    h+='<div class="'+(hist?'revh':'')+'">';
+    if(ok) h+=ansBlock(it,ci,posOf(ci),"g","✓ Deine Antwort (richtig)",hist);
+    else {
+      h+=ansBlock(it,a,posOf(a),"r","✗ Deine Antwort",hist);
+      h+=ansBlock(it,ci,posOf(ci),"g","✓ Richtige Antwort",hist);
+    }
+    h+='</div><div class="expl"><b>Erklärung: </b>'+fmt(it.explanation)+'</div></article>';
+  });
+  h+='<div class="row"><button class="btn sec" id="toresult">Zur Auswertung</button><button class="btn" id="restart">Neu starten</button></div></section>';
+  return h;
+}
+
+function render(){
+  app.innerHTML = state.screen==="start"?viewStart():state.screen==="q"?viewQ():state.screen==="result"?viewResult():viewReview();
+}
+
+app.addEventListener("click",function(e){
+  var b=e.target.closest("button");if(!b||!app.contains(b)||b.disabled)return;
+  if(b.id==="go"){reset();state.idx=0;setScreen("q");}
+  else if(b.id==="restart"){reset();setScreen("q");}
+  else if(b.id==="review")setScreen("review");
+  else if(b.id==="toresult")setScreen("result");
+  else if(b.id==="back"){state.idx--;setScreen("q");}
+  else if(b.id==="next"){if(state.idx<items.length-1){state.idx++;setScreen("q");}else setScreen("result");}
+  else if(b.dataset.oi!==undefined){
+    state.answers[state.idx]=+b.dataset.oi;
+    app.querySelectorAll(".opt").forEach(function(x){x.setAttribute("aria-checked",x===b?"true":"false");});
+    var nx=document.getElementById("next");if(nx)nx.disabled=false;
+  }
+});
+/* Test hook: index of the correct option in the current (shuffled) question */
+if(new URLSearchParams(location.search).has('test')){window.__sc={correctPos:function(){return state.orders[state.idx].findIndex(function(oi){return items[state.idx].options[oi].correct;});}};}
+reset();render();
+})();
+</script>
+</body>
+</html>
